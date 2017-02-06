@@ -56,24 +56,16 @@ sealed trait Stream[+A] {
   }
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = {
-    @annotation.tailrec
-    def go(s: Stream[A], z: => B)(f: (A, => B) => B): B = {
-      s match {
-        case Cons(h, t) => go(t(), f(h(), z))(f)
-        case _ => z
-      }
-    }
-
-    go(this.reverse, z)(f)
+    this.reverse.foldLeft(z)((b, a) => f(a, b))
   }
 
   def reverse: Stream[A] = {
-    foldLeft(empty[A])((a, b) => cons(a, b))
+    foldLeft(empty[A])((a, b) => cons(b, a))
   }
 
   @annotation.tailrec
-  final def foldLeft[B](z: => B)(f: (A, => B) => B): B = this match {
-    case Cons(h, t) => t().foldLeft(f(h(), z))(f)
+  final def foldLeft[B](z: => B)(f: (=> B, A) => B): B = this match {
+    case Cons(h, t) => t().foldLeft(f(z, h()))(f)
     case _ => z
   }
 

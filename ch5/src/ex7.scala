@@ -8,5 +8,7 @@ object ex7 {
     println(Stream(1, 2, 3, 4).reverse.toList)
     println(Stream(1, 2, 3, 4).foldRight(0)((a, b) => a - b))
     println(Stream(1, 2, 3, 4).foldRightStackOverflow(0)((a, b) => a - b))
+    println(Stream(1, 2, 3, 4).foldRight(Nil: List[Int])((a, b) => a :: b))
+    println(Stream(1, 2, 3, 4).foldRightStackOverflow(Nil: List[Int])((a, b) => a :: b))
   }
 }
