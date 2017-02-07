@@ -1,5 +1,5 @@
 object ex5 {
   def main(args: Array[String]): Unit = {
-    println(Stream(1, 2, 3, 4, 5, 6).takeWhile(x => (x % 2) == 0).toList)
+    println(Stream(1, 3, 5, 2, 4, 6).takeWhile(_ < 4).toList)
   }
 }

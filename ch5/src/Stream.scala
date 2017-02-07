@@ -38,7 +38,6 @@ sealed trait Stream[+A] {
 
   def takeWhile(p: A => Boolean): Stream[A] = this match {
     case Cons(h, t) if p(h()) => cons(h(), t().takeWhile(p))
-    case Cons(_, t) => t().takeWhile(p)
     case _ => empty
   }
 
@@ -74,7 +73,7 @@ sealed trait Stream[+A] {
   }
 
   def takeWhile2(p: A => Boolean): Stream[A] = {
-    foldRight(empty[A])((a, b) => cons(a, b))
+    foldRight(empty[A])((a, b) => if (p(a)) cons(a, b) else empty )
   }
 
   def headOption2: Option[A] = {
@@ -99,6 +98,65 @@ sealed trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] = {
     foldRight(empty[B])((a, b) => f(a).append(b))
   }
+
+  def map3[B](f: A => B): Stream[B] = {
+    unfold(this) {
+      case Cons(h, t) => Some((f(h()), t()))
+      case _ => None
+    }
+  }
+
+  def take3(n: Int): Stream[A] = {
+    unfold((this, n)) {
+      case (Cons(h, t), n) if n > 0 => Some((h(), (t(), n - 1)))
+      case _ => None
+    }
+  }
+
+  def takeWhile3(f: A => Boolean): Stream[A] = {
+    unfold(this) {
+      case Cons(h, t) if f(h()) => Some((h(), t()))
+      case _ => None
+    }
+  }
+
+  def zipWith[B, C](s2: Stream[B])(f: (A, B) => C): Stream[C] = {
+    unfold((this, s2)) {
+      case (Cons(h1, t1), Cons(h2, t2)) => Some((f(h1(), h2()), (t1(), t2())))
+      case _ => None
+    }
+  }
+
+  def zipAll[B](s2: Stream[B]): Stream[(Option[A], Option[B])] = {
+    unfold((this, s2)) {
+      case (Cons(h1, t1), Cons(h2, t2)) => Some((Some(h1()), Some(h2())), (t1(), t2()))
+      case (Cons(h1, t1), Empty) => Some((Some(h1()), None), (t1(), Empty))
+      case (Empty, Cons(h2, t2)) => Some((None, Some(h2())), (Empty, t2()))
+      case _ => None
+    }
+  }
+
+  def startsWith[A](s: Stream[A]): Boolean = {
+    zipAll(s).forAll {
+      case (Some(a), Some(b)) => a == b
+      case (Some(a), None) => true
+      case _ => false
+    }
+  }
+
+  def tails: Stream[Stream[A]] = {
+    unfold(this) {
+      case Cons(h, t) => Some((cons(h(), t()), t()))
+      case _ => None
+    }.append(Stream(empty))
+  }
+
+  def scanRight[B](z: B)(f: (A, B) => B): Stream[B] = {
+    unfold((this.reverse, z)) {
+      case (Cons(h, t), z) => Some((f(h(), z), (t(), f(h(), z))))
+      case _ => None
+    }.reverse.append(Stream(z))
+  }
 }
 
 case object Empty extends Stream[Nothing]
@@ -117,5 +175,44 @@ object Stream {
   def apply[A](as: A*): Stream[A] = {
     if (as.isEmpty) empty
     else cons(as.head, apply(as.tail: _*))
+  }
+
+  def constant[A](a: A): Stream[A] = {
+    cons(a, constant(a))
+  }
+
+  def from(n: Int): Stream[Int] = {
+    cons(n, from(n + 1))
+  }
+
+  def fibs: Stream[Int] = {
+    def go(a: Int, b: Int): Stream[Int] = {
+      cons(a, go(b, a + b))
+    }
+
+    go(0, 1)
+  }
+
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
+    f(z) match {
+      case Some((h,s)) => cons(h, unfold(s)(f))
+      case None => empty
+    }
+  }
+
+  def ones2: Stream[Int] = {
+    unfold(1)(_ => Some((1,1)))
+  }
+
+  def constant2[A](a: A): Stream[A] = {
+    unfold(a)(_ => Some((a, a)))
+  }
+
+  def from2(n: Int): Stream[Int] = {
+    unfold(n)(n => Some((n, n + 1)))
+  }
+
+  def fibs2: Stream[Int] = {
+    unfold((0, 1)){ case (a, b) => Some((a, (b, a + b)))}
   }
 }
