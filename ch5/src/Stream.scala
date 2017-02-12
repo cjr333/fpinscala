@@ -50,7 +50,7 @@ sealed trait Stream[+A] {
   }
 
   def foldRightStackOverflow[B](z: => B)(f: (A, => B) => B): B = this match {
-    case Cons(h, t) => f(h(), t().foldRight(z)(f))
+    case Cons(h, t) => f(h(), t().foldRightStackOverflow(z)(f))
     case _ => z
   }
 
