@@ -60,10 +60,6 @@ object RNG {
 
   type Rand[+A] = RNG => (A, RNG)
 
-  def unit[A](a: A): Rand[A] = {
-    rng => (a, rng)
-  }
-
   def map[A, B](s: Rand[A])(f: A => B): Rand[B] = {
     rng => {
       val (a, rng2) = s(rng)
@@ -95,6 +91,10 @@ object RNG {
 
   val randDoubleInt: Rand[(Double, Int)] = {
     both(double2, int)
+  }
+
+  def unit[A](a: A): Rand[A] = {
+    rng => (a, rng)
   }
 
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
