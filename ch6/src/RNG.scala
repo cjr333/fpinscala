@@ -53,7 +53,7 @@ object RNG {
     if (count > 0) {
       val (i, rng1) = rng.nextInt
       val (list, rng2) = intsStackOverflow(count - 1)(rng1)
-      return (i :: list, rng2)
+      (i :: list, rng2)
     }
     else (List(), rng)
   }
