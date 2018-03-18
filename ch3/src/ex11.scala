@@ -1,15 +1,18 @@
-/**
-  * Created by cjr333 on 2017-01-30.
-  */
+import List._
+
 object ex11 {
   def main(args: Array[String]): Unit = {
-//    val x = List(1, 2, 3, 4)
-//    println(List.sum3(x))
-//    println(List.product3(x))
-//    println(List.length3(x))
+    def sum(ints: List[Int]) =
+      foldLeft(ints, 0)(_ + _)
 
-    println(List.sum3(List(1, 2, 3, 4)))
-    println(List.product3(List(1, 2, 3, 4)))
-    println(List.length3(List(1, 2, 3, 4)))
+    def product(ds: List[Double]) =
+      foldLeft(ds, 1.0)(_ * _)
+
+    def length[A](l: List[A]): Int =
+      foldLeft(l, 0)((b, _) => b + 1)
+
+    println(sum(List(1, 2, 3)))
+    println(product(List(1, 2, 3)))
+    println(length(List(1, 2, 3)))
   }
 }

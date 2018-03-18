@@ -1,8 +1,10 @@
-/**
-  * Created by cjr333 on 2017-01-30.
-  */
+import List._
+
 object ex14 {
   def main(args: Array[String]): Unit = {
-    println(List.append(List(1, 2, 3), List(4, 5, 6)))
+    def appendUsingFoldRight[A](a1: List[A], a2: List[A]): List[A] =
+      foldRightUsingFoldLeft(a1, a2)(Cons(_, _))
+
+    println(appendUsingFoldRight(List(1, 2, 3), List(4, 5, 6)))
   }
 }

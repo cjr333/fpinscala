@@ -1,8 +1,8 @@
-/**
-  * Created by cjr333 on 2017-01-30.
-  */
+import List._
+
 object ex3 {
   def main(args: Array[String]): Unit = {
-    println(List.setHead(5, List(1, 2, 3, 4)))
+    println(setHead(Nil, 1))
+    println(setHead(List(1, 2, 3, 4), 5))
   }
 }

@@ -1,8 +1,8 @@
-/**
-  * Created by cjr333 on 2017-01-30.
-  */
+import List._
+
 object ex8 {
   def main(args: Array[String]): Unit = {
-    println(List.foldRight(List(1, 2, 3), Nil:List[Int])(Cons(_,_)))
+    // List(1, 2, 3)을 다시 리턴하겠지..
+    println(foldRight(List(1, 2, 3), Nil:List[Int])(Cons(_, _)))
   }
 }

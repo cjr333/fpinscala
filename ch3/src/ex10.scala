@@ -1,15 +1,22 @@
-/**
-  * Created by cjr333 on 2017-01-30.
-  */
+import List._
+
 object ex10 {
   def main(args: Array[String]): Unit = {
-    // init list
-    val x = List.makeInts(Nil, 1000000)
+    // setup data
+    @annotation.tailrec
+    def loop(l: List[Int], n: Int): List[Int] = n match {
+      case 0 => l
+      case x if x > 0 => loop(Cons(n, l), n - 1)
+      case _ => Nil
+    }
 
-    // stackoverflow
-    //List.sum2(x)
+    val data = loop(Nil, 10000)
+    try {
+      println(foldRight(data, 0)(_ + _))
+    } catch {
+      case e: Throwable => println(e)
+    }
 
-    // stack-safe
-    println(List.sum3(x))
+    println(foldLeft(data, 0)(_ + _))
   }
 }

@@ -1,10 +1,8 @@
-/**
-  * Created by cjr333 on 2017-01-30.
-  */
+import List._
+
 object ex15 {
   def main(args: Array[String]): Unit = {
-    val x = List(List(1, 2, 3), List(4, 5), List(6))
-    println(x)
-    println(List.flatMap(x))
+    // BigO(n - 모든 요소 수) 에 처리되도록 주의하자.
+    println(flatten(List(List(1, 2), List(3, 4), List(5, 6))))
   }
 }
