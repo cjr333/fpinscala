@@ -89,4 +89,40 @@ object List {
   def flatten[A](ass: List[List[A]]): List[A] = {
     foldRightUsingFoldLeft(ass, Nil: List[A])(append)
   }
+
+  def map[A, B](as: List[A])(f: A => B): List[B] = as match {
+    case Nil => Nil
+    case Cons(h, t) => Cons(f(h), map(t)(f))
+  }
+
+  def filter[A](as: List[A])(f: A => Boolean): List[A] = as match {
+    case Nil => Nil
+    case Cons(h, t) if f(h) => Cons(h, filter(t)(f))
+    case Cons(h, t) if !f(h) => filter(t)(f)
+  }
+
+  def flatMap[A, B](as: List[A])(f: A => List[B]): List[B] =
+    flatten(map(as)(f))
+
+  def zipWith[A, B, C](as: List[A], bs: List[B])(f: (A, B) => C): List[C] = as match {
+    case Nil => Nil
+    case Cons(ah, at) => bs match {
+      case Nil => Nil
+      case Cons(bh, bt) => Cons(f(ah, bh), zipWith(at, bt)(f))
+    }
+  }
+
+  def startsWith[A](sup: List[A], sub: List[A]): Boolean = (sup, sub) match {
+    case (_, Nil) => true
+    case (Nil, _) => false
+    case (Cons(ph, pt), Cons(bh, bt)) if ph == bh => startsWith(pt, bt)
+    case _ => false
+  }
+
+  def hasSubSequence[A](sup: List[A], sub: List[A]): Boolean = (sup, sub) match {
+    case (_, Nil) => true
+    case (Nil, _) => false
+    case (Cons(_, _), Cons(_, _)) if startsWith(sup, sub) => true
+    case (Cons(_, pt), Cons(_, _)) if !startsWith(sup, sub) => hasSubSequence(pt, sub)
+  }
 }
