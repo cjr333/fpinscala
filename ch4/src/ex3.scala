@@ -1,3 +1,5 @@
+import Option.map2
+
 object ex3 {
   def main(args: Array[String]): Unit = {
     println(parseInsuranceRateQuote("35", "0"))
@@ -18,9 +20,5 @@ object ex3 {
   def Try[A](a: => A): Option[A] = {
     try Some(a)
     catch { case e: Exception => None }
-  }
-
-  def map2[A, B, C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] =  {
-    a.flatMap(aa => b.map(bb => f(aa, bb)))
   }
 }

@@ -3,7 +3,7 @@ object ex1 {
     println(mean(Seq(1.0, 2.0, 3.0)).map(d => d.toInt))
     println(mean(Seq.empty[Double]).map(d => d.toInt))
     println(Some(4).map(tenDividedBy))
-    //println(Some(0).map(tenDividedBy))
+//    println(Some(0).map(tenDividedBy))
     println(None.map(tenDividedBy))
     println(Some(4).flatMap(tenDividedByFlat))
     println(Some(0).flatMap(tenDividedByFlat))
