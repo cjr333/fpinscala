@@ -9,6 +9,24 @@ object ex1 {
     println(Some(0).flatMap(tenDividedByFlat))
     println(None.flatMap(tenDividedByFlat))
     println(Some(2).filter(_ % 2 == 1))
+
+    println(toDouble("a").orElse(toInt("a")))
+  }
+
+  def toInt(s: String): Option[Int] = {
+    try {
+      Some(s.toInt)
+    } catch {
+      case e: Exception => None
+    }
+  }
+
+  def toDouble(s: String): Option[Double] = {
+    try {
+      Some(s.toDouble)
+    } catch {
+      case e: Exception => None
+    }
   }
 
   def mean(xs: Seq[Double]): Option[Double] = {
