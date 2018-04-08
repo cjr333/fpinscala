@@ -176,7 +176,7 @@ sealed trait Stream[+A] {
   def scanRight[B](z: B)(f: (A, B) => B): Stream[B] = this match {
     case Cons(h, t) => {
       lazy val subStream = t().scanRight(z)(f)
-      Stream(f(h(), subStream.headOption2.get)).append(subStream)
+      Stream(f(h(), subStream.headOption.get)).append(subStream)
     }
     case _ => Stream(z)
   }
@@ -196,6 +196,10 @@ sealed trait Stream[+A] {
       }
       case _ => None
     }.reverse.append(Stream(z))
+  }
+
+  def scanRight4[B](z: B)(f: (A, B) => B): Stream[B] = {
+    foldRight(Stream(z))((a, bs) => Stream(f(a, bs.headOption.get)).append(bs))
   }
 }
 
