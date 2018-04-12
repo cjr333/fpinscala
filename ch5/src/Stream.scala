@@ -201,6 +201,13 @@ sealed trait Stream[+A] {
   def scanRight4[B](z: B)(f: (A, B) => B): Stream[B] = {
     foldRight(Stream(z))((a, bs) => Stream(f(a, bs.headOption.get)).append(bs))
   }
+
+
+  def scanRight5[B](z: B)(f: (A, B) => B): Stream[B] = {
+    tails.map(sa => {
+      sa.foldRight(z)((a, b) => f(a, b))
+    })
+  }
 }
 
 case object Empty extends Stream[Nothing]
