@@ -14,7 +14,7 @@ object ex11 {
   def simulationMachine(inputs: List[Input]): State[Machine, (Int, Int)] = {
     State((s:Machine) => {
       val machine = inputs.foldLeft(s)((machine, input) => Machine.handleInput(machine, input))
-      ((machine.coins, machine.candies), machine)
+      ((machine.candies, machine.coins), machine)
     })
   }
 }
