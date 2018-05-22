@@ -16,11 +16,10 @@ object ex6 {
     val executorService = Executors.newFixedThreadPool(10)
 
     val list = List(1, 2, 3, 4, 5)
-    val parlist = Par.parMap(list)(i => {println(i); i.toDouble})
+    val parlist = Par.parMap(list)(i => {println(i); Thread.sleep(3000); i.toDouble})
     println(parlist(executorService).get())
 
-    val filterlist = Par.parFilter(list)(i => i % 2 == 0)
+    val filterlist = Par.parFilter(list)(i => {println(i); Thread.sleep(3000); i % 2 == 0})
     println(filterlist(executorService).get())
-
   }
 }
