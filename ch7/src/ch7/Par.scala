@@ -1,3 +1,5 @@
+package ch7
+
 import java.util.concurrent._
 
 object Par {
@@ -26,9 +28,15 @@ object Par {
     }
   }
   def fork[A](a: => Par[A]): Par[A] = {
-    es => es.submit(new Callable[A] {
-      def call = a(es).get
-    })
+    es => {
+      println(Thread.currentThread().getId())
+      es.submit(new Callable[A] {
+        def call = {
+          println(Thread.currentThread().getId())
+          a(es).get
+        }
+      })
+    }
   }
 
   def map2Advanced[A, B, C](a: Par[A], b: Par[B])(f: (A, B) => C): Par[C] = {
@@ -104,5 +112,13 @@ object Par {
     val temp1 = map2(pa, pb)((a, b) => (c: C, d: D) => f(a, b, c, d))
     val temp2 = map2(temp1, pc)((fcd, c) => (d: D) => fcd(c, d))
     map2(temp2, pd)((fd, d) => fd(d))
+  }
+
+  def equal[A](es: ExecutorService)(p: Par[A], p2: Par[A]): Boolean = {
+    p(es).get() == p2(es).get()
+  }
+
+  def delay[A](fa: => Par[A]): Par[A] = {
+    es => fa(es)
   }
 }

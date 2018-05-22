@@ -1,6 +1,7 @@
-import java.util.concurrent._
+package ch7
 
 import Par._
+import java.util.concurrent._
 
 object util {
   def main(args: Array[String]): Unit = {

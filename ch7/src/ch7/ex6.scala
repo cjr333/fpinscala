@@ -1,4 +1,6 @@
-import java.util.concurrent.{ExecutorService, Executors}
+package ch7
+
+import java.util.concurrent._
 
 object ex6 {
   def main(args: Array[String]): Unit = {

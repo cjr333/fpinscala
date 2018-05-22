@@ -1,0 +1,11 @@
+map(y)(id) == y
+
+map(y)(id) = id(y)
+map(y)(f) = f(y)
+
+map(map(y)(g))(f) == map(y)(f compose g)
+
+f(map(y)(g))
+f(g(y))
+(f compose g)(y)
+map(y)(f compose g)
