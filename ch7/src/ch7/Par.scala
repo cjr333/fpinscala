@@ -121,4 +121,46 @@ object Par {
   def delay[A](fa: => Par[A]): Par[A] = {
     es => fa(es)
   }
+
+  def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] = {
+//    es => {
+//      choices.lift(n(es).get()) match {
+//        case Some(a) => a(es)
+//        case None => throw new Exception("out of index")
+//      }
+//    }
+    chooser(n)(i => choices.lift(i).get)
+  }
+
+  def choice[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] = {
+//    val n: Par[Int] = map(cond)(cond => if (cond) 0 else 1)
+//    val choices = List(t, f)
+//    choiceN(n)(choices)
+    chooser(cond)(b => if(b) t else f)
+  }
+
+  def choiceMap[K, V](key: Par[K])(choices: Map[K, Par[V]]): Par[V] = {
+    es => {
+      choices.get(key(es).get()) match {
+        case Some(a) => a(es)
+        case None => throw new Exception("not exist key")
+      }
+    }
+  }
+
+  def chooser[A, B](pa: Par[A])(choices: A => Par[B]): Par[B] = {
+    es => {
+      choices(pa(es).get())(es)
+    }
+  }
+
+  def join[A](a: Par[Par[A]]): Par[A] = {
+    es => a(es).get()(es)
+//    flatMap(a)(pa => pa)
+  }
+
+  def flatMap[A, B](a: Par[A])(f: A => Par[B]): Par[B] = {
+//    es => f(a(es).get())(es)
+    join(map(a)(f))
+  }
 }
