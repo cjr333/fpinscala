@@ -1,4 +1,4 @@
-case class Gen[A](sample: State[RNG, A]) {
+case class Gen[+A](sample: State[RNG, A]) {
   def flatMap[B](f: A => Gen[B]): Gen[B] = {
     Gen(sample.flatMap(a => f(a).sample))
   }
@@ -6,6 +6,8 @@ case class Gen[A](sample: State[RNG, A]) {
   def listOfN(size: Gen[Int]): Gen[List[A]] = {
     size.flatMap(n => Gen.listOfN(n, this))
   }
+
+  def unsized: SGen[A] = SGen(_ => this)
 }
 
 object Gen {
@@ -17,9 +19,13 @@ object Gen {
 
   def boolean: Gen[Boolean] = Gen(State(RNG.nonNegativeInt).map(n => (n % 2) == 0))
 
-  def listOf[A](g: Gen[A]): Gen[List[A]] = {
-    val (n, rng) = RNG.nonNegativeInt(SimpleRNG(System.currentTimeMillis()))
-    listOfN(n % 100, g)
+//  def listOf[A](g: Gen[A]): Gen[List[A]] = {
+//    val (n, rng) = RNG.nonNegativeInt(SimpleRNG(System.currentTimeMillis()))
+//    listOfN(n % 100, g)
+//  }
+
+  def listOf[A](g: Gen[A]): SGen[List[A]] = {
+    SGen(size => listOfN(size, g))
   }
 
   def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] = {
@@ -43,4 +49,10 @@ object Gen {
     val sum = g1._2 + g2._2
     Gen(State(RNG.double)).flatMap(d => if (d < g1._2 / sum) g1._1 else g2._1)
   }
+}
+
+case class SGen[+A](forSize: Int => Gen[A]) {
+  def apply(n: Int): Gen[A] = forSize(n)
+
+  def flatMap[B](f: A => SGen[B]): SGen[B] = SGen(size => this.forSize(size).flatMap(f(_).forSize(size)))
 }

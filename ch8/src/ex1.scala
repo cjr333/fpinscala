@@ -9,7 +9,7 @@ object ex1 {
     val failingProp = forAll(intList)(ns => ns.reverse == ns)
 
     val simpleRNG = SimpleRNG(System.currentTimeMillis())
-    println(prop.run(10, simpleRNG))
-    println(failingProp.run(10, simpleRNG))
+    println(prop.run(10, 100, simpleRNG))
+    println(failingProp.run(10, 100, simpleRNG))
   }
 }
