@@ -145,6 +145,9 @@ sealed trait Stream[+A] {
     }
   }
 
+  def zip[B](s2: Stream[B]): Stream[(A,B)] =
+    zipWith(s2)((_,_))
+
   def zipAll[B](s2: Stream[B]): Stream[(Option[A], Option[B])] = {
     unfold(this, s2){
       case (Cons(ah, at), Cons(bh, bt)) => Some((Some(ah()), Some(bh())), (at(), bt()))
@@ -207,6 +210,12 @@ sealed trait Stream[+A] {
     tails.map(sa => {
       sa.foldRight(z)((a, b) => f(a, b))
     })
+  }
+
+  @annotation.tailrec
+  final def find(f: A => Boolean): Option[A] = this match {
+    case Empty => None
+    case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
   }
 }
 

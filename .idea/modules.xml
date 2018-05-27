@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/ch5/ch5.iml" filepath="$PROJECT_DIR$/ch5/ch5.iml" />
       <module fileurl="file://$PROJECT_DIR$/ch6/ch6.iml" filepath="$PROJECT_DIR$/ch6/ch6.iml" />
       <module fileurl="file://$PROJECT_DIR$/ch7/ch7.iml" filepath="$PROJECT_DIR$/ch7/ch7.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ch8/ch8.iml" filepath="$PROJECT_DIR$/ch8/ch8.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/fpinscala.iml" filepath="$PROJECT_DIR$/.idea/fpinscala.iml" />
     </modules>
   </component>
