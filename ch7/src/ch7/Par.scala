@@ -163,4 +163,7 @@ object Par {
 //    es => f(a(es).get())(es)
     join(map(a)(f))
   }
+
+  def equal[A](p: Par[A], p2: Par[A]): Par[Boolean] =
+    Par.map2(p, p2)(_ == _)
 }

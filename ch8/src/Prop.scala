@@ -1,10 +1,28 @@
+import java.util.concurrent.Executors
+
+import Gen._
 import Prop._
+import ch7.Par.Par
 
 object Prop {
   type FailedCase = String
   type SucessCount = Int
   type TestCases = Int
   type MaxSize = Int
+
+  def run(p: Prop,
+          maxSize: Int = 100,
+          testCases: Int = 100,
+          rng: RNG = SimpleRNG(System.currentTimeMillis)): Unit = {
+    p.run(maxSize, testCases, rng) match {
+      case Falsified(msg, n) =>
+        println(s"! Falsified after $n passed tests:\n $msg")
+      case Passed =>
+        println(s"+ OK, passed $testCases tests.")
+      case Proved =>
+        println(s"+ OK, proved property.")
+    }
+  }
 
   def forAll[A](as: Gen[A])(f: A => Boolean): Prop = Prop {
     (n,rng) => randomStream(as)(rng).zip(Stream.from(0)).take(n).map {
@@ -33,12 +51,28 @@ object Prop {
   }
 
   def randomStream[A](g: Gen[A])(rng: RNG): Stream[A] =
-    Stream.unfold(rng)(rng => Some(g.sample.run(rng)))
+    Stream.unfold(rng)(rng => scala.Some(g.sample.run(rng)))
 
   def buildMsg[A](s: A, e: Exception): String =
     s"test case: $s\n" +
       s"generated an exception: ${e.getMessage}\n" +
       s"stack trace:\n ${e.getStackTrace.mkString("\n")}"
+
+  def check(p: => Boolean): Prop = Prop { (_, _, _) =>
+    if (p) Proved else Falsified("()", 0)
+  }
+
+  val S = weighted(
+    choose(1, 5).map(Executors.newFixedThreadPool) ->   .75,
+    unit(Executors.newCachedThreadPool) -> 0.25
+  )
+
+  def forAllPar[A](g: Gen[A])(f: A => Par[Boolean]): Prop = {
+    forAll(S ** g) { case (s, a) => f(a)(s).get }
+  }
+
+  def checkPar(p: => Par[Boolean]): Prop =
+    forAllPar(Gen.unit(()))(_ => p)
 
   sealed trait Result {
     def isFalsified: Boolean
@@ -48,10 +82,13 @@ object Prop {
   case object Passed extends Result {
     override def isFalsified = false
     override def &&(r: Result): Result = r match {
-      case Passed => Passed
       case Falsified(f, s) => Falsified("Right : " + f, s)
+      case _ => Passed
     }
-    override def ||(r: Result): Result = this
+    override def ||(r: Result): Result = r match {
+      case Proved => Proved
+      case _ => Passed
+    }
   }
   case class Falsified(failure: FailedCase, successes: SucessCount) extends Result {
     override def isFalsified = true
@@ -59,9 +96,18 @@ object Prop {
       Falsified("Left : " + this.failure, this.successes)
     }
     override def ||(r: Result): Result = r match {
-      case Passed => Passed
       case Falsified(f, s) => Falsified("Left : " + this.failure + ", Right : " + f, Math.min(this.successes, s))
+      case _ => r
     }
+  }
+  case object Proved extends Result {
+    override def isFalsified = false
+    override def &&(r: Result): Result = r match {
+      case Proved => Proved
+      case Passed => Passed
+      case Falsified(f, s) => Falsified("Right : " + f, s)
+    }
+    override def ||(r: Result): Result = this
   }
 }
 
